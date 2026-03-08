@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แบบประเมิน UDON AI WARP</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --indigo: #1e3a8a;
+    --indigo-mid: #2563eb;
+    --blue: #3b82f6;
+    --cyan: #06b6d4;
+    --teal: #0d9488;
+    --purple: #7c3aed;
+    --gold: #f59e0b;
+    --bg: #f0f4ff;
+    --white: #ffffff;
+    --gray-50: #f8faff;
+    --gray-100: #eef2ff;
+    --gray-200: #e0e7ff;
+    --gray-500: #6b7280;
+    --gray-700: #374151;
+    --text: #111827;
+    --shadow: 0 4px 24px rgba(37,99,235,0.10);
+    --shadow-lg: 0 8px 48px rgba(30,58,138,0.18);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'IBM Plex Sans Thai', 'Noto Sans Thai', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(124,58,237,0.07) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 80%, rgba(6,182,212,0.07) 0%, transparent 55%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .warp-deco {
+    position: fixed;
+    top: -80px; right: -80px;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    border: 2px solid rgba(6,182,212,0.2);
+    box-shadow: 0 0 0 30px rgba(6,182,212,0.04), 0 0 0 70px rgba(6,182,212,0.025), 0 0 0 130px rgba(6,182,212,0.015);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .wrapper {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #0f172a 0%, var(--indigo) 45%, #0891b2 100%);
+    border-radius: 20px;
+    padding: 32px 32px 28px;
+    margin-bottom: 28px;
+    color: white;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+  }
+  .header-glow {
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 240px; height: 240px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(6,182,212,0.30), transparent 70%);
+    animation: pulse 4s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{transform:scale(1);opacity:.6;} 50%{transform:scale(1.2);opacity:1;} }
+  .header-emoji {
+    position: absolute;
+    right: 28px; bottom: 16px;
+    font-size: 60px;
+    opacity: 0.18;
+    filter: blur(1px);
+    line-height: 1;
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 50px;
+    padding: 5px 14px;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .badge-school {
+    background: rgba(255,255,255,0.13);
+    border: 1px solid rgba(255,255,255,0.22);
+  }
+  .badge-ai {
+    background: linear-gradient(90deg, rgba(124,58,237,0.8), rgba(6,182,212,0.8));
+    border: 1px solid rgba(255,255,255,0.2);
+    letter-spacing: 0.06em;
+  }
+  .header h1 {
+    font-size: clamp(20px, 5vw, 26px);
+    font-weight: 800;
+    line-height: 1.3;
+    margin-bottom: 6px;
+    position: relative;
+  }
+  .header h1 .accent {
+    background: linear-gradient(90deg, #93c5fd, #67e8f9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header h2 {
+    font-size: 14px;
+    font-weight: 400;
+    opacity: 0.78;
+    line-height: 1.55;
+    position: relative;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--gray-200);
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--indigo);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title::before {
+    content: '';
+    display: inline-block;
+    width: 4px; height: 18px;
+    background: linear-gradient(to bottom, var(--indigo-mid), var(--cyan));
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  /* FIELDS */
+  .field-group { margin-bottom: 16px; }
+  .field-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 8px;
+  }
+  .field-label span { color: var(--indigo-mid); }
+  input[type="text"], input[type="date"], textarea {
+    width: 100%;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--text);
+    background: var(--gray-50);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  input:focus, textarea:focus {
+    border-color: var(--indigo-mid);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.10);
+    background: white;
+  }
+  textarea { resize: vertical; min-height: 90px; }
+
+  /* STATUS */
+  .status-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  @media(min-width:500px){ .status-grid { grid-template-columns: repeat(4,1fr); } }
+  .status-btn {
+    border: 2px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 10px 6px;
+    background: var(--gray-50);
+    cursor: pointer;
+    text-align: center;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--gray-700);
+    transition: all 0.18s;
+    user-select: none;
+  }
+  .status-btn:hover { border-color: var(--blue); color: var(--indigo-mid); background: #eff6ff; }
+  .status-btn.active {
+    border-color: var(--indigo-mid);
+    background: linear-gradient(135deg, #eff6ff, #f0fdfe);
+    color: var(--indigo);
+    box-shadow: 0 2px 10px rgba(37,99,235,0.14);
+  }
+  .status-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+
+  /* RATING */
+  .score-legend { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .legend-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+  }
+  .l5{background:#0d9488;} .l4{background:#06b6d4;} .l3{background:#3b82f6;} .l2{background:#8b5cf6;} .l1{background:#f59e0b;}
+
+  .rating-table { width: 100%; border-collapse: collapse; }
+  .rating-table th {
+    font-size: 13px; font-weight: 700; color: var(--gray-500);
+    text-align: center; padding: 0 0 12px;
+  }
+  .rating-table th:first-child { text-align: left; }
+  .criteria-row { border-top: 1px solid var(--gray-100); transition: background 0.15s; }
+  .criteria-row:hover { background: #f8faff; }
+  .criteria-cell {
+    padding: 14px 12px 14px 0;
+    font-size: 14px; line-height: 1.65;
+    color: var(--text); vertical-align: middle;
+  }
+  .criteria-num { color: var(--indigo-mid); font-weight: 700; margin-right: 4px; }
+  .star-cell { text-align: center; vertical-align: middle; padding: 14px 4px; }
+  .star-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 2px solid var(--gray-200);
+    cursor: pointer; background: var(--gray-50);
+    font-size: 13px; font-weight: 700; color: var(--gray-500);
+    transition: all 0.16s; user-select: none;
+  }
+  .star-btn:hover { border-color: var(--gold); color: var(--gold); transform: scale(1.12); background: #fffcf0; }
+  .s5{background:#0d9488;border-color:#0d9488;color:white;box-shadow:0 2px 8px rgba(13,148,136,0.32);}
+  .s4{background:#06b6d4;border-color:#06b6d4;color:white;box-shadow:0 2px 8px rgba(6,182,212,0.28);}
+  .s3{background:#3b82f6;border-color:#3b82f6;color:white;box-shadow:0 2px 8px rgba(59,130,246,0.28);}
+  .s2{background:#8b5cf6;border-color:#8b5cf6;color:white;box-shadow:0 2px 8px rgba(139,92,246,0.25);}
+  .s1{background:#f59e0b;border-color:#f59e0b;color:white;box-shadow:0 2px 8px rgba(245,158,11,0.28);}
+
+  /* SCORE BAR */
+  .score-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 0 0; border-top: 2px solid var(--gray-100); margin-top: 4px;
+  }
+  .score-label { font-weight: 700; font-size: 15px; color: var(--indigo); }
+  .score-value { font-size: 26px; font-weight: 800; color: var(--indigo); }
+  .score-bar-wrap {
+    flex: 1; margin: 0 16px; height: 10px;
+    background: var(--gray-100); border-radius: 8px; overflow: hidden;
+  }
+  .score-bar {
+    height: 100%; border-radius: 8px;
+    background: linear-gradient(90deg, var(--indigo), var(--blue), var(--cyan));
+    transition: width 0.4s cubic-bezier(.4,2,.6,1);
+  }
+
+  /* SUBMIT */
+  .submit-btn {
+    width: 100%; padding: 16px;
+    background: linear-gradient(135deg, #0f172a 0%, var(--indigo-mid) 60%, var(--cyan) 130%);
+    color: white; border: none; border-radius: 14px;
+    font-family: inherit; font-size: 16px; font-weight: 700;
+    cursor: pointer; box-shadow: 0 4px 20px rgba(37,99,235,0.35);
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(37,99,235,0.42); }
+  .submit-btn:active { transform: translateY(0); }
+  .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  /* SUCCESS */
+  .success-box {
+    display: none;
+    background: linear-gradient(135deg, #eff6ff, #f0fdfe, #f5f3ff);
+    border: 2px solid #93c5fd;
+    border-radius: 20px; padding: 40px 28px;
+    text-align: center; margin-bottom: 20px;
+    position: relative; overflow: hidden;
+  }
+  .success-box::before {
+    content: '';
+    position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
+    width: 220px; height: 220px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(6,182,212,0.13), transparent 70%);
+  }
+  .success-box.show { display: block; animation: popIn 0.45s cubic-bezier(.4,2,.6,1); }
+  @keyframes popIn { 0%{transform:scale(0.85);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+  .success-icon { font-size: 58px; margin-bottom: 14px; position: relative; }
+  .success-title { font-size: 22px; font-weight: 800; color: var(--indigo); margin-bottom: 10px; position: relative; }
+  .success-sub { font-size: 14px; color: var(--indigo-mid); opacity: 0.85; white-space: pre-line; line-height: 1.8; position: relative; }
+  .reset-btn {
+    margin-top: 22px; padding: 13px 32px;
+    background: linear-gradient(135deg, var(--indigo), var(--indigo-mid));
+    color: white; border: none; border-radius: 12px;
+    font-family: inherit; font-size: 15px; font-weight: 700;
+    cursor: pointer; box-shadow: 0 4px 14px rgba(37,99,235,0.28);
+    transition: all 0.18s;
+  }
+  .reset-btn:hover { transform: translateY(-2px); }
+
+  /* ERROR */
+  .error-box {
+    display: none;
+    background: #fff7ed; border: 1.5px solid #fed7aa;
+    border-radius: 10px; padding: 14px 16px;
+    font-size: 14px; color: #9a3412; margin-bottom: 16px;
+  }
+  .error-box.show { display: block; }
+
+  /* FOOTER */
+  .footer { text-align: center; font-size: 13px; color: var(--gray-500); margin-top: 16px; }
+  .footer strong { color: var(--indigo); }
+
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2.5px solid rgba(255,255,255,0.4);
+    border-top-color: white; border-radius: 50%;
+    animation: spin 0.7s linear infinite; display: none;
+  }
+  @keyframes spin { to{transform:rotate(360deg);} }
+</style>
+</head>
+<body>
+<div class="warp-deco"></div>
+<div class="wrapper">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-glow"></div>
+    <div class="header-emoji">🌀</div>
+    <div class="header-top">
+      <div class="badge badge-school">🏫 โรงเรียนหนองสำโรงวิทยา</div>
+      <div class="badge badge-ai">✨ AI PROJECT</div>
+    </div>
+    <h1>แบบประเมินการเยี่ยมชมโครงงาน<br><span class="accent">UDON AI WARP</span></h1>
+    <h2>วาร์ปทิพย์… ไปอุดร · ระบบแนะนำแหล่งท่องเที่ยวด้วยปัญญาประดิษฐ์</h2>
+  </div>
+
+  <!-- FORM -->
+  <div id="formContainer">
+
+    <div class="card">
+      <div class="card-title">ข้อมูลผู้เยี่ยมชม</div>
+
+      <div class="field-group">
+        <label class="field-label">ชื่อ-สกุล ผู้เยี่ยมชม <span>*</span></label>
+        <input type="text" id="visitorName" placeholder="กรอกชื่อ-สกุล" />
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">สถานะ <span>*</span></label>
+        <div class="status-grid">
+          <button class="status-btn" onclick="selectStatus(this,'คณะกรรมการ/ครู')">
+            <span class="status-icon">👨‍🏫</span>คณะกรรมการ/ครู
+          </button>
+          <button class="status-btn" onclick="selectStatus(this,'ผู้ปกครอง')">
+            <span class="status-icon">👨‍👩‍👧</span>ผู้ปกครอง
+          </button>
+          <button class="status-btn" onclick="selectStatus(this,'นักเรียน')">
+            <span class="status-icon">🎒</span>นักเรียน
+          </button>
+          <button class="status-btn" onclick="selectStatus(this,'บุคคลทั่วไป')">
+            <span class="status-icon">👤</span>บุคคลทั่วไป
+          </button>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">วันที่เยี่ยมชม</label>
+        <input type="date" id="visitDate" />
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">เกณฑ์การประเมิน</div>
+      <div class="score-legend">
+        <span class="legend-pill l5">5 ดีเยี่ยม</span>
+        <span class="legend-pill l4">4 ดีมาก</span>
+        <span class="legend-pill l3">3 ดี</span>
+        <span class="legend-pill l2">2 พอใช้</span>
+        <span class="legend-pill l1">1 ควรปรับปรุง</span>
+      </div>
+      <table class="rating-table">
+        <thead>
+          <tr>
+            <th style="text-align:left;">ประเด็นการประเมิน</th>
+            <th>5</th><th>4</th><th>3</th><th>2</th><th>1</th>
+          </tr>
+        </thead>
+        <tbody id="criteriaBody"></tbody>
+      </table>
+      <div class="score-row">
+        <span class="score-label">รวมคะแนน</span>
+        <div class="score-bar-wrap"><div class="score-bar" id="scoreBar" style="width:0%"></div></div>
+        <span class="score-value"><span id="totalScore">0</span><small style="font-size:14px;font-weight:500;color:#999;">/25</small></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">ข้อเสนอแนะ / คำติชมเพิ่มเติมเพื่อการพัฒนา</div>
+      <textarea id="comments" placeholder="กรอกข้อเสนอแนะหรือคำติชมเพื่อการพัฒนาโครงงาน UDON AI WARP (ถ้ามี)"></textarea>
+    </div>
+
+    <div class="error-box" id="errorBox"></div>
+
+    <button class="submit-btn" id="submitBtn" onclick="submitForm()">
+      <span id="submitText">🚀 ส่งแบบประเมิน</span>
+      <div class="spinner" id="spinner"></div>
+    </button>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-box" id="successBox">
+    <div class="success-icon">🌀✨</div>
+    <div class="success-title">วาร์ปสำเร็จ! ขอบคุณสำหรับการประเมิน</div>
+    <div class="success-sub" id="successDetail"></div>
+    <button class="reset-btn" onclick="resetForm()">📝 ทำแบบประเมินอีกครั้ง</button>
+  </div>
+
+  <div class="footer">
+    <strong>UDON AI WARP 🌀</strong> · วาร์ปทิพย์… ไปอุดร · โรงเรียนหนองสำโรงวิทยา
+  </div>
+</div>
+
+<script>
+const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwcSIdOBDfV2p7myNd23dkSd6JJkClqvRMpVObyvKVvimkZOqDMez0hCbDV9ekRXkuV/exec';
+
+const criteria = [
+  "ความคิดสร้างสรรค์และความแปลกใหม่ของการนำ AI มาช่วยแนะนำแหล่งท่องเที่ยวอุดรธานี",
+  "ความถูกต้องและครบถ้วนของข้อมูลแหล่งท่องเที่ยว วัฒนธรรม และอาหารพื้นเมืองอุดรธานี",
+  "ความใช้งานง่าย ความสะดวก และประสิทธิภาพของระบบ (User Experience)",
+  "ความเป็นไปได้ในการนำไปใช้งานจริงและโอกาสในการพัฒนาต่อยอดเชิงพาณิชย์หรือการท่องเที่ยว",
+  "การนำเสนอผลงาน การอธิบาย และการตอบคำถามของนักเรียน"
+];
+
+let scores = [0,0,0,0,0];
+let selectedStatus = '';
+
+function init() {
+  document.getElementById('visitDate').value = new Date().toISOString().split('T')[0];
+  const tbody = document.getElementById('criteriaBody');
+  criteria.forEach((c, i) => {
+    const tr = document.createElement('tr');
+    tr.className = 'criteria-row';
+    let cells = `<td class="criteria-cell"><span class="criteria-num">${i+1}.</span>${c}</td>`;
+    [5,4,3,2,1].forEach(v => {
+      cells += `<td class="star-cell"><button class="star-btn" id="b${i}_${v}" onclick="setScore(${i},${v})">${v}</button></td>`;
+    });
+    tr.innerHTML = cells;
+    tbody.appendChild(tr);
+  });
+}
+
+function selectStatus(btn, val) {
+  document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedStatus = val;
+}
+
+function setScore(idx, val) {
+  scores[idx] = val;
+  [5,4,3,2,1].forEach(v => {
+    const b = document.getElementById(`b${idx}_${v}`);
+    b.className = 'star-btn' + (v === val ? ` s${v}` : '');
+  });
+  const total = scores.reduce((a,b)=>a+b,0);
+  document.getElementById('totalScore').textContent = total;
+  document.getElementById('scoreBar').style.width = (total/25*100)+'%';
+}
+
+async function submitForm() {
+  document.getElementById('errorBox').classList.remove('show');
+  const name = document.getElementById('visitorName').value.trim();
+  const date = document.getElementById('visitDate').value;
+  const comments = document.getElementById('comments').value.trim();
+  const url = GOOGLE_SHEET_URL;
+
+  if (!name) { showErr('กรุณากรอกชื่อ-สกุล'); return; }
+  if (!selectedStatus) { showErr('กรุณาเลือกสถานะ'); return; }
+  const missing = scores.filter(s=>s===0).length;
+  if (missing > 0) { showErr(`กรุณาให้คะแนนให้ครบทุกข้อ (ยังเหลือ ${missing} ข้อ)`); return; }
+
+  const total = scores.reduce((a,b)=>a+b,0);
+  const data = {
+    timestamp: new Date().toLocaleString('th-TH'),
+    name, status: selectedStatus, date,
+    score1: scores[0], score2: scores[1], score3: scores[2],
+    score4: scores[3], score5: scores[4],
+    total, comments
+  };
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  document.getElementById('submitText').textContent = 'กำลังส่ง...';
+  document.getElementById('spinner').style.display = 'block';
+
+  try {
+    await fetch(url, {
+      method: 'POST', mode: 'no-cors',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(data)
+    });
+  } catch(e) {
+    console.error("Error submitting form", e);
+  }
+
+  setTimeout(() => {
+    document.getElementById('formContainer').style.display = 'none';
+    document.getElementById('successBox').classList.add('show');
+    const star = total >= 22 ? '🌟 ยอดเยี่ยม!' : total >= 18 ? '👍 ดีมาก' : total >= 13 ? '✅ ผ่านเกณฑ์' : '📝 ขอบคุณ';
+    document.getElementById('successDetail').textContent =
+      `${name}  ·  สถานะ: ${selectedStatus}  ·  คะแนนรวม: ${total}/25  ${star}\n✅ บันทึกข้อมูลสำเร็จ`;
+    window.scrollTo({top:0,behavior:'smooth'});
+  }, 900);
+}
+
+function showErr(msg) {
+  const b = document.getElementById('errorBox');
+  b.textContent = '⚠️ ' + msg;
+  b.classList.add('show');
+}
+
+function resetForm() {
+  document.getElementById('formContainer').style.display = 'block';
+  document.getElementById('successBox').classList.remove('show');
+  document.getElementById('visitorName').value = '';
+  document.getElementById('comments').value = '';
+  document.getElementById('visitDate').value = new Date().toISOString().split('T')[0];
+  selectedStatus = ''; scores = [0,0,0,0,0];
+  document.querySelectorAll('.status-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.star-btn').forEach(b=>b.className='star-btn');
+  document.getElementById('totalScore').textContent = '0';
+  document.getElementById('scoreBar').style.width = '0%';
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = false;
+  document.getElementById('submitText').textContent = '🚀 ส่งแบบประเมิน';
+  document.getElementById('spinner').style.display = 'none';
+  document.getElementById('errorBox').classList.remove('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+init();
+</script>
+</body>
+</html>
